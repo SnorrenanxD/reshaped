@@ -1,3 +1,6 @@
+# app.py
+# Streamlit app that provides a chat interface for the SMS Assistant.
+
 import streamlit as st
 from src.router import handle_query
 

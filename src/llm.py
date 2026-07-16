@@ -1,3 +1,6 @@
+# src/llm.py
+# Handles the interaction with the LLM (Qwen-3) via Ollama.
+
 import ollama
 
 MODEL_NAME = "qwen3:8b"
