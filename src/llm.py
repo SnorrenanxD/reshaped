@@ -14,3 +14,10 @@ def stream_response(messages: list[dict]):
     )
     for chunk in stream:
         yield chunk["message"]["content"]
+
+def warm_up():
+    ollama.chat(
+        model=MODEL_NAME,
+        messages=[{"role": "user", "content": "hi"}],
+        keep_alive="30m",
+    )
