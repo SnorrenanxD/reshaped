@@ -1,6 +1,5 @@
 # app.py
-# Streamlit app that provides a chat interface for the SMS Assistant.
-
+import json
 import streamlit as st
 from src.llm import warm_up
 from src.router import handle_query
@@ -9,15 +8,25 @@ st.title("SMS Assistant")
 
 
 @st.cache_resource
+def get_chunks():
+    with open("data/processed/sections.json") as f:
+        return json.load(f)
+
+
+@st.cache_resource
 def get_warmed_up_llm():
     warm_up()
     return True
 
 
+chunks = get_chunks()
 get_warmed_up_llm()
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+if "active_chunk" not in st.session_state:
+    st.session_state.active_chunk = None
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -29,6 +38,10 @@ if prompt := st.chat_input("Describe the situation..."):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        response = st.write_stream(handle_query(st.session_state.messages))
+        response_stream, used_chunk = handle_query(
+            st.session_state.messages, chunks, st.session_state.active_chunk
+        )
+        response_text = st.write_stream(response_stream)
 
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.active_chunk = used_chunk
+    st.session_state.messages.append({"role": "assistant", "content": response_text})
