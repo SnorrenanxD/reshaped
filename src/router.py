@@ -9,9 +9,13 @@ SYSTEM_PROMPT = """You are an assistant helping crew apply a ship's Safety Manag
 Respond naturally, like a knowledgeable colleague — not always in a fixed template.
 
 Grounding rules:
-- The section id and title are already shown to the user above your answer, in the app —
-  do not repeat, restate, or re-derive the section number yourself. Focus purely on the
-  practical guidance grounded in the provided text.
+- The section id and title shown above your answer is fixed and already correct —
+  do not repeat or re-derive it yourself.
+- If other sections are listed as "referenced by name" in the context, you may cite
+  their exact ids when relevant. Do not invent or guess any OTHER section number
+  that is not the primary source or explicitly listed as a reference — if the text
+  mentions a procedure by name without a number and no matching id was given to you,
+  refer to it by name only, without a number.
 - Never invent procedures, form numbers, contacts, or steps that are not in the provided text.
 - If the manual states WHO is responsible or WHEN to act, but does not specify HOW,
   say explicitly that the manual does not specify the technique, rather than supplying
@@ -53,6 +57,18 @@ def resolve_section(query: str, chunks: list[dict]) -> dict | None:
     return None
 
 
+def find_cross_references(chunk: dict, all_chunks: list[dict]) -> list[dict]:
+    text_lower = chunk["text"].lower()
+    refs = []
+    for other in all_chunks:
+        if other["id"] == chunk["id"]:
+            continue
+        title = other["title"].split(": ", 1)[-1]  # strip "Chapter: " prefix
+        if len(title) > 4 and title.lower() in text_lower:
+            refs.append(other)
+    return refs
+
+
 def handle_query(messages: list[dict], chunks: list[dict], active_chunk: dict | None):
     last_query = messages[-1]["content"]
     new_chunk = resolve_section(last_query, chunks)
@@ -63,6 +79,12 @@ def handle_query(messages: list[dict], chunks: list[dict], active_chunk: dict | 
     if chunk:
         note = " (continuing from the same section)" if continuation else ""
         context = f'Relevant manual section: "{chunk["title"]}"\n{chunk["text"]}'
+
+        refs = find_cross_references(chunk, chunks)
+        if refs:
+            ref_lines = "\n".join(f"- {r['id']}: {r['title']}" for r in refs)
+            context += f"\n\nSections referenced by name in the text above (cite these exact ids if relevant):\n{ref_lines}"
+
         prefix = f"**Source: Section {chunk['id']} — {chunk['title']}**{note}\n\n"
     else:
         context = "No matching section was found in the manual for this message."
