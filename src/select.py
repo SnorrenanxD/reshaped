@@ -47,7 +47,8 @@ VERIFY_PROMPT = """Section "{title}":
 
 Question: "{query}"
 
-Does this section actually answer or address this question? Answer only yes or no."""
+Is this the correct procedure category for this situation, even if the situation is minor and the section text focuses on more severe cases?
+Answer only yes or no."""
 
 
 def select_sections(query: str, chunks: list[dict]) -> list[dict]:
