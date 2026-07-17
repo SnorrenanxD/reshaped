@@ -2,16 +2,10 @@
 # Streamlit app that provides a chat interface for the SMS Assistant.
 
 import streamlit as st
-from src.search import build_retriever
 from src.llm import warm_up
 from src.router import handle_query
 
 st.title("SMS Assistant")
-
-
-@st.cache_resource
-def get_retriever():
-    return build_retriever("data/processed/sections.json")
 
 
 @st.cache_resource
@@ -20,7 +14,6 @@ def get_warmed_up_llm():
     return True
 
 
-retriever = get_retriever()
 get_warmed_up_llm()
 
 if "messages" not in st.session_state:

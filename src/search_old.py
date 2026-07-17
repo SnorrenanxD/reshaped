@@ -1,4 +1,5 @@
 # src/search.py
+# DEPRECATED: This module is no longer used. The search functionality has been moved to the llm in src/select.py.
 
 import re
 import json

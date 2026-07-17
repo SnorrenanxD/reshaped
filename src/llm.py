@@ -1,23 +1,27 @@
 # src/llm.py
-# Handles the interaction with the LLM (Qwen-3) via Ollama.
-
 import ollama
 
 MODEL_NAME = "qwen3:8b"
 
 def stream_response(messages: list[dict]):
-    """Receives messages and returns a stream of responses from the LLM."""
     stream = ollama.chat(
-        model=MODEL_NAME,
-        messages=messages,
-        stream=True,
+        model=MODEL_NAME, 
+        messages=messages, 
+        stream=True, 
+        keep_alive="30m"
     )
     for chunk in stream:
         yield chunk["message"]["content"]
 
-def warm_up():
-    ollama.chat(
+def structured_response(messages: list[dict], schema: dict, think: bool = False) -> str:
+    response = ollama.chat(
         model=MODEL_NAME,
-        messages=[{"role": "user", "content": "hi"}],
+        messages=messages,
+        format=schema,
+        think=think,
         keep_alive="30m",
     )
+    return response["message"]["content"]
+
+def warm_up():
+    ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": "hi"}], keep_alive="30m")
