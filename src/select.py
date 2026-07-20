@@ -1,6 +1,6 @@
 # src/select.py
 import json
-from src.llm import structured_response
+from src.llm import generate_structured
 
 SCHEMA = {
     "type": "object",
@@ -41,7 +41,6 @@ VERIFY_SCHEMA = {
     },
     "required": ["answer"],
 }
-
 VERIFY_PROMPT = """Section "{title}":
 {text}
 
@@ -55,13 +54,12 @@ def select_sections(query: str, chunks: list[dict]) -> list[dict]:
     index = "\n".join(f"{c['id']}: {c['title']}" for c in chunks)
     prompt = PROMPT.format(index=index, query=query)
 
-    raw = structured_response([{"role": "user", "content": prompt}], SCHEMA)
-    result = json.loads(raw)
-
+    result = generate_structured([{"role": "user", "content": prompt}], SCHEMA)
     known_ids = {c["id"] for c in chunks}
     return [m for m in result["matches"] if m["id"] in known_ids]
 
+
 def verify_match(query: str, chunk: dict) -> bool:
     prompt = VERIFY_PROMPT.format(title=chunk["title"], text=chunk["text"], query=query)
-    raw = structured_response([{"role": "user", "content": prompt}], VERIFY_SCHEMA, think=False)
-    return json.loads(raw)["answer"] == "yes"
+    result = generate_structured([{"role": "user", "content": prompt}], VERIFY_SCHEMA, think=False)
+    return result["answer"] == "yes"

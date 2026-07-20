@@ -1,7 +1,6 @@
 # app.py
 import json
 import streamlit as st
-from src.llm import warm_up
 from src.router import handle_query
 
 st.title("SMS Assistant")
@@ -13,18 +12,10 @@ def get_chunks():
         return json.load(f)
 
 
-@st.cache_resource
-def get_warmed_up_llm():
-    warm_up()
-    return True
-
-
 chunks = get_chunks()
-get_warmed_up_llm()
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
 if "active_chunk" not in st.session_state:
     st.session_state.active_chunk = None
 
