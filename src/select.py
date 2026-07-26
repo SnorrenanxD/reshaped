@@ -1,7 +1,9 @@
 # src/select.py
+# LLM-based retrieval: which manual section(s) match a query, and how confidently.
 import json
 from src.llm import generate_structured
 
+# select_sections: candidate section ids with a confidence each.
 SCHEMA = {
     "type": "object",
     "properties": {
@@ -34,6 +36,7 @@ Confidence rules:
 
 Return the 1-3 most relevant section ids with your confidence."""
 
+# verify_match: yes/no second-pass check used when retrieval isn't already "high" confidence.
 VERIFY_SCHEMA = {
     "type": "object",
     "properties": {
@@ -51,15 +54,17 @@ Answer only yes or no."""
 
 
 def select_sections(query: str, chunks: list[dict]) -> list[dict]:
+    """Asks the LLM which sections plausibly match the query, with a confidence each."""
     index = "\n".join(f"{c['id']}: {c['title']}" for c in chunks)
     prompt = PROMPT.format(index=index, query=query)
 
-    result = generate_structured([{"role": "user", "content": prompt}], SCHEMA)
+    result, _ = generate_structured([{"role": "user", "content": prompt}], SCHEMA)
     known_ids = {c["id"] for c in chunks}
-    return [m for m in result["matches"] if m["id"] in known_ids]
+    return [m for m in result["matches"] if m["id"] in known_ids]  # drop any hallucinated id
 
 
 def verify_match(query: str, chunk: dict) -> bool:
+    """Re-reads one section against the query to confirm it's actually the right one."""
     prompt = VERIFY_PROMPT.format(title=chunk["title"], text=chunk["text"], query=query)
-    result = generate_structured([{"role": "user", "content": prompt}], VERIFY_SCHEMA, think=False)
+    result, _ = generate_structured([{"role": "user", "content": prompt}], VERIFY_SCHEMA, think=False)
     return result["answer"] == "yes"

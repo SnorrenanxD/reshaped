@@ -1,8 +1,9 @@
 # test_select.py
 import json
-from src.router import resolve_section
+from src.router import resolve_context
 
 def load_chunks(path: str) -> list[dict]:
+    """Loads the ingested sections used as retrieval context."""
     with open(path) as f:
         return json.load(f)
 
@@ -31,15 +32,18 @@ if __name__ == "__main__":
     path_counts = {"direct": 0, "verified": 0, "escalate": 0}
 
     for query, expected in test_cases:
-        chunk, path = resolve_section(query, chunks)
+        ctx = resolve_context(query, chunks)
+        chunk = ctx["chunk"]
         got_id = chunk["id"] if chunk else None
+        # direct: one high-confidence match. verified: confirmed by re-read. escalate: no match.
+        path = "escalate" if chunk is None else "verified" if ctx["verified"] else "direct"
         hit = got_id == expected
         correct += hit
         path_counts[path] += 1
 
         marker = "✓" if hit else "✗"
         print(f"{marker}  [{path:9s}] query: {query}")
-        print(f"           verwacht={expected}  gekregen={got_id}")
+        print(f"           expected={expected}  got={got_id}")
 
     print(f"\nScore: {correct}/{len(test_cases)}")
-    print(f"Paden: {path_counts}")
+    print(f"Paths: {path_counts}")

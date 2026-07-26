@@ -7,16 +7,21 @@ from difflib import SequenceMatcher
 
 import pdfplumber
 
+# Page footer stamp, e.g. "SMM: 8.3 Revision: 2 Effective Date: 01 NOV 2020" — captures the section id.
 FOOTER = re.compile(r"SMM:\s*([\d.]+)\s*Revision:\s*\d+\s*Effective Date:\s*(?:\d{1,2}\s+[A-Za-z]{3}\s+\d{4})?")
+# Running header block above the section title, ending at the "Safety Management System/Manual" line.
 HEADER = re.compile(
     r"(?P<title>.*?)\nMarine Ops: Originator: Approved By:\nSafety Management (?:System|Manual).*?\n",
     re.DOTALL
 )
+# Table-of-contents lines, e.g. "Section 8 Emergency Preparedness ... 01 NOV 2020".
 CHAPTER = re.compile(r"Section (\d+) (.+?) \d{2} NOV \d{4}", re.DOTALL)
+# Appendix/form pages, e.g. "Appendix: SMF 9.3 Incident Report".
 APPENDIX = re.compile(r"^Appendix:\s*(SMF\s*[\d.]+(?:\([a-z]\))?)\s*(.*)$")
 
 
 def parse_chapter_titles(pdf) -> dict[str, str]:
+    """Chapter number -> title, read from the manual's table of contents pages."""
     toc = "\n".join((pdf.pages[i].extract_text() or "") for i in range(1, 4))
     titles = {m.group(1): m.group(2).replace("\n", " ").strip() for m in CHAPTER.finditer(toc)}
     # chapters 5 and 12 wrap through the TOC date column
@@ -26,6 +31,7 @@ def parse_chapter_titles(pdf) -> dict[str, str]:
 
 
 def clean_page(page_text: str) -> tuple[str, str]:
+    """Strips the running header/footer from a page, returning (body, section title)."""
     match = HEADER.search(page_text)
     if not match:
         return page_text, ""
@@ -45,6 +51,7 @@ def clean_page(page_text: str) -> tuple[str, str]:
 
 
 def build_chunks(pdf_path: str) -> list[dict]:
+    """Walks every PDF page and groups them into one chunk per section id."""
     with pdfplumber.open(pdf_path) as pdf:
         chapters = parse_chapter_titles(pdf)
         pages = [p.extract_text(x_tolerance=1) or "" for p in pdf.pages]
@@ -87,6 +94,7 @@ def build_chunks(pdf_path: str) -> list[dict]:
 
 
 if __name__ == "__main__":
+    # Rebuild data/processed/sections.json from the raw PDF.
     chunks = build_chunks("data/raw/Case Manual marineops_sms.pdf")
     print(f"Chunks: {len(chunks)}")
     with open("data/processed/sections.json", "w") as f:

@@ -8,21 +8,24 @@ Run from the project root: python -m test_router  (or python test_router.py if s
 """
 
 import json
-from src.router import resolve_section, handle_query
+from src.router import resolve_section, handle_query, flatten_answer
 
 
 def load_chunks(path: str = "data/processed/sections.json") -> list[dict]:
+    """Loads the ingested sections used as retrieval context."""
     with open(path) as f:
         return json.load(f)
 
 
 def print_header(title: str):
+    """Banner so each test section is easy to spot in the output."""
     print(f"\n{'=' * 60}\n{title}\n{'=' * 60}")
 
 
 def run_full_response(query: str, chunks: list[dict], active_chunk=None) -> str:
-    stream, _ = handle_query([{"role": "user", "content": query}], chunks, active_chunk)
-    return "".join(stream)
+    """Runs one turn end-to-end and returns the flattened answer text."""
+    answer, _ = handle_query([{"role": "user", "content": query}], chunks, active_chunk)
+    return flatten_answer(answer)
 
 
 if __name__ == "__main__":
@@ -40,7 +43,7 @@ if __name__ == "__main__":
         got = chunk["id"] if chunk else None
         marker = "✓" if got == expected else "✗"
         print(f"{marker}  query: {query}")
-        print(f"     verwacht={expected}  opgehaald={got}  titel={chunk['title'] if chunk else None}")
+        print(f"     expected={expected}  got={got}  title={chunk['title'] if chunk else None}")
 
     # --- Test 2: easter egg should NOT fire on benign messages ---
     print_header("TEST 2 — easter egg should only fire on actual injection attempts")
@@ -57,12 +60,12 @@ if __name__ == "__main__":
     for query in benign_cases:
         response = run_full_response(query, chunks)
         fired = "galley" in response.lower() or "recipe" in response.lower() or "🍝" in response
-        marker = "✗ EASTER EGG FIRED ONBENIGN INPUT" if fired else "✓ normaal antwoord"
+        marker = "✗ EASTER EGG FIRED ONBENIGN INPUT" if fired else "✓ normal answer"
         print(f"{marker}\n  query: {query}\n  response: {response[:200]}\n")
 
     for query in injection_cases:
         response = run_full_response(query, chunks)
-        print(f"  [injectie] query: {query}\n  response: {response[:200]}\n")
+        print(f"  [injection] query: {query}\n  response: {response[:200]}\n")
 
     # --- Test 3: hallucination consistency — run the same query 3x ---
     print_header("TEST 3 — hallucination consistency (same query, 3 runs)")
