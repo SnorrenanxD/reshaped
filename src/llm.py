@@ -9,7 +9,14 @@ import ollama
 OLLAMA_MODEL = "qwen3:8b"  # local fallback, used when Gemini is unreachable
 GEMINI_MODEL = "gemini-3.1-flash-lite"  # primary model
 
-gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+# No API key is treated the same as an unreachable Gemini: skip it and run on the local
+# fallback, rather than failing at import (genai.Client raises on a missing key).
+_api_key = os.environ.get("GEMINI_API_KEY")
+gemini_client = genai.Client(api_key=_api_key) if _api_key else None
+GEMINI_AVAILABLE = gemini_client is not None
+if not GEMINI_AVAILABLE:
+    print(f"GEMINI_API_KEY not set — running on the local fallback ({OLLAMA_MODEL}).")
+
 _ollama_warmed = False  # only send the Ollama warm-up ping once per process
 
 
@@ -31,18 +38,19 @@ def _to_gemini_prompt(messages: list[dict]) -> str:
 
 def generate_structured(messages: list[dict], schema: dict, think: bool = False) -> tuple[dict, str]:
     """Gemini first, Ollama fallback. Returns (result, model_used)."""
-    try:
-        response = gemini_client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=_to_gemini_prompt(messages),
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=schema,
-            ),
-        )
-        return json.loads(response.text), GEMINI_MODEL
-    except Exception as e:
-        print(f"Gemini structured call failed, falling back to Ollama: {e}")
+    if gemini_client is not None:
+        try:
+            response = gemini_client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=_to_gemini_prompt(messages),
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=schema,
+                ),
+            )
+            return json.loads(response.text), GEMINI_MODEL
+        except Exception as e:
+            print(f"Gemini structured call failed, falling back to Ollama: {e}")
 
     _ensure_ollama_warm()
     response = ollama.chat(

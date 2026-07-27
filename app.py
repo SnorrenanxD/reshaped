@@ -3,7 +3,7 @@
 import json
 import streamlit as st
 from src.router import handle_query, flatten_answer
-from src.llm import GEMINI_MODEL, OLLAMA_MODEL
+from src.llm import GEMINI_AVAILABLE, GEMINI_MODEL, OLLAMA_MODEL
 from src.format import format_section_text
 
 st.set_page_config(page_title="SMS Assistant", page_icon="⚓")
@@ -142,9 +142,12 @@ def render_sidebar():
             color = "green" if last_model == GEMINI_MODEL else "gray"
             st.markdown(f":{color}-badge[● {last_model}]")
             if last_model != GEMINI_MODEL:
-                st.caption(f"`{GEMINI_MODEL}` unreachable — running on the local fallback.")
-        else:
+                cause = "unreachable" if GEMINI_AVAILABLE else "not configured"
+                st.caption(f"`{GEMINI_MODEL}` {cause} — running on the local fallback.")
+        elif GEMINI_AVAILABLE:
             st.caption(f"`{GEMINI_MODEL}` (API) · fallback `{OLLAMA_MODEL}` (local)")
+        else:
+            st.caption(f"No `GEMINI_API_KEY` — running on `{OLLAMA_MODEL}` (local).")
 
         user_turns = [m["content"] for m in st.session_state.messages if m["role"] == "user"]
         if user_turns:

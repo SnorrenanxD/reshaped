@@ -1,0 +1,9 @@
+# Runtime dependencies. Version floors are the versions this was developed against.
+#
+# numpy / rank-bm25 / sentence-transformers are deliberately left out: they are only
+# needed by archive/search_old.py, the deprecated retriever that nothing imports anymore.
+
+streamlit>=1.44        # st.pills, :color-badge[...] markdown, :material/ icons
+google-genai>=2.12     # primary model (Gemini)
+ollama>=0.6            # local fallback model
+pdfplumber>=0.11       # PDF ingestion (src/ingest.py)

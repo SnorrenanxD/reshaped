@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 1060" width="980" height="1060" font-family="Inter, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4a4a63"/>
+    </marker>
+    <marker id="arrowDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2b5f8f"/>
+    </marker>
+  </defs>
+
+  <rect width="980" height="1060" fill="#ffffff"/>
+
+  <!-- ================= ONE-TIME INGEST ================= -->
+  <text x="40" y="26" font-size="11" letter-spacing="1.5" fill="#8a8aa0" font-weight="600">ONE-TIME INGEST</text>
+
+  <!-- source document -->
+  <path d="M 40 40 L 230 40 L 230 98 C 199 112 167 84 135 98 C 103 112 71 84 40 98 Z"
+        fill="#eef4fb" stroke="#2b5f8f" stroke-width="1.6"/>
+  <text x="135" y="66" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">Case Manual</text>
+  <text x="135" y="82" font-size="11.5" text-anchor="middle" fill="#4a4a63">marineops_sms.pdf · 239 p.</text>
+
+  <line x1="232" y1="72" x2="292" y2="72" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- ingest -->
+  <rect x="300" y="40" width="190" height="70" rx="10" fill="#f4f0f9" stroke="#6b2d8f" stroke-width="1.6"/>
+  <text x="395" y="66" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">src/ingest.py</text>
+  <text x="395" y="84" font-size="11.5" text-anchor="middle" fill="#4a4a63">parse + chunk on footers</text>
+
+  <line x1="492" y1="72" x2="544" y2="72" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- sections store -->
+  <path d="M 550 52 L 550 98 A 100 12 0 0 0 750 98 L 750 52" fill="#eef4fb" stroke="#2b5f8f" stroke-width="1.6"/>
+  <ellipse cx="650" cy="52" rx="100" ry="12" fill="#eef4fb" stroke="#2b5f8f" stroke-width="1.6"/>
+  <text x="650" y="76" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">sections.json</text>
+  <text x="650" y="92" font-size="11.5" text-anchor="middle" fill="#4a4a63">87 sections</text>
+
+  <line x1="40" y1="140" x2="940" y2="140" stroke="#e2e2ec" stroke-width="1"/>
+
+  <!-- ================= PER QUERY ================= -->
+  <text x="40" y="170" font-size="11" letter-spacing="1.5" fill="#8a8aa0" font-weight="600">PER QUERY</text>
+
+  <!-- start -->
+  <rect x="60" y="258" width="150" height="48" rx="24" fill="#eef7f0" stroke="#2f7a45" stroke-width="1.6"/>
+  <text x="135" y="288" font-size="13" text-anchor="middle" fill="#1a1a2e" font-weight="600">User query</text>
+
+  <line x1="212" y1="282" x2="384" y2="282" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- select -->
+  <rect x="390" y="246" width="270" height="76" rx="10" fill="#f4f0f9" stroke="#6b2d8f" stroke-width="1.6"/>
+  <text x="525" y="272" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">src/select.py</text>
+  <text x="525" y="290" font-size="11.5" text-anchor="middle" fill="#4a4a63">match query → section id + title</text>
+  <text x="525" y="307" font-size="11.5" text-anchor="middle" fill="#4a4a63">returns candidates + confidence</text>
+
+  <!-- store feeds select -->
+  <path d="M 650 112 L 650 190 L 600 190 L 600 242" fill="none" stroke="#2b5f8f" stroke-width="1.4"
+        stroke-dasharray="5 4" marker-end="url(#arrowDash)"/>
+  <text x="662" y="168" font-size="11" fill="#2b5f8f">id + title index</text>
+
+  <line x1="525" y1="324" x2="525" y2="338" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- decision 1 -->
+  <path d="M 525 342 L 660 400 L 525 458 L 390 400 Z" fill="#fff6e5" stroke="#c47f0a" stroke-width="1.6"/>
+  <text x="525" y="396" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">high-confidence</text>
+  <text x="525" y="413" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">matches?</text>
+
+  <!-- branch: exactly 1 -->
+  <line x1="525" y1="460" x2="525" y2="706" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="536" y="492" font-size="11.5" fill="#4a4a63" font-weight="600">exactly 1 → trust directly</text>
+
+  <!-- branch: 0 or 2+ -->
+  <path d="M 388 400 L 250 400 L 250 464" fill="none" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="318" y="392" font-size="11.5" text-anchor="middle" fill="#4a4a63" font-weight="600">0 or 2+</text>
+
+  <!-- verify -->
+  <rect x="140" y="470" width="220" height="72" rx="10" fill="#f4f0f9" stroke="#6b2d8f" stroke-width="1.6"/>
+  <text x="250" y="498" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">verify_match</text>
+  <text x="250" y="516" font-size="11.5" text-anchor="middle" fill="#4a4a63">re-read full section text,</text>
+  <text x="250" y="532" font-size="11.5" text-anchor="middle" fill="#4a4a63">best candidate first</text>
+
+  <line x1="250" y1="544" x2="250" y2="562" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- decision 2 -->
+  <path d="M 250 566 L 370 620 L 250 674 L 130 620 Z" fill="#fff6e5" stroke="#c47f0a" stroke-width="1.6"/>
+  <text x="250" y="616" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">section text</text>
+  <text x="250" y="633" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">confirms match?</text>
+
+  <path d="M 372 620 L 450 620 L 450 706" fill="none" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="398" y="610" font-size="11.5" fill="#4a4a63" font-weight="600">yes</text>
+
+  <line x1="250" y1="676" x2="250" y2="724" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="260" y="702" font-size="11.5" fill="#4a4a63" font-weight="600">none confirm</text>
+
+  <!-- no match -->
+  <rect x="100" y="728" width="270" height="62" rx="31" fill="#fdeeee" stroke="#b03636" stroke-width="1.6"/>
+  <text x="235" y="754" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">No appropriate match</text>
+  <text x="235" y="772" font-size="11.5" text-anchor="middle" fill="#4a4a63">user informed, no answer invented</text>
+
+  <!-- citable pool -->
+  <rect x="680" y="716" width="240" height="64" rx="10" fill="#fbfaff" stroke="#6b2d8f" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="800" y="738" font-size="11.5" text-anchor="middle" fill="#6b2d8f" font-weight="700">citable reference pool</text>
+  <text x="800" y="755" font-size="11" text-anchor="middle" fill="#4a4a63">unused candidates +</text>
+  <text x="800" y="770" font-size="11" text-anchor="middle" fill="#4a4a63">cross-refs named in text</text>
+
+  <line x1="680" y1="748" x2="662" y2="748" stroke="#6b2d8f" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arrowDash)"/>
+
+  <!-- generate -->
+  <rect x="390" y="710" width="270" height="76" rx="10" fill="#f4f0f9" stroke="#6b2d8f" stroke-width="1.6"/>
+  <text x="525" y="736" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">generate answer</text>
+  <text x="525" y="754" font-size="11.5" text-anchor="middle" fill="#4a4a63">section text + conversation</text>
+  <text x="525" y="771" font-size="11.5" text-anchor="middle" fill="#4a4a63">context + citable pool</text>
+
+  <line x1="525" y1="788" x2="525" y2="797" stroke="#4a4a63" stroke-width="1.6"/>
+  <text x="660" y="800" font-size="11" text-anchor="middle" fill="#4a4a63" font-style="italic">section_id per step checked against pool, cleared if unknown</text>
+  <line x1="525" y1="797" x2="525" y2="804" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <!-- decision 3 -->
+  <path d="M 525 808 L 655 862 L 525 916 L 395 862 Z" fill="#fff6e5" stroke="#c47f0a" stroke-width="1.6"/>
+  <text x="525" y="858" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">action request or</text>
+  <text x="525" y="875" font-size="12.5" text-anchor="middle" fill="#1a1a2e" font-weight="600">follow-up / info?</text>
+
+  <path d="M 393 862 L 290 862 L 290 934" fill="none" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="340" y="853" font-size="11.5" text-anchor="middle" fill="#4a4a63" font-weight="600">action</text>
+
+  <path d="M 657 862 L 790 862 L 790 934" fill="none" stroke="#4a4a63" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="724" y="853" font-size="11.5" text-anchor="middle" fill="#4a4a63" font-weight="600">info / follow-up</text>
+
+  <!-- outputs -->
+  <rect x="110" y="938" width="360" height="88" rx="44" fill="#eef7f0" stroke="#2f7a45" stroke-width="1.6"/>
+  <text x="290" y="966" font-size="13" text-anchor="middle" fill="#1a1a2e" font-weight="600">Guided workflow</text>
+  <text x="290" y="984" font-size="11.5" text-anchor="middle" fill="#4a4a63">phases · checkboxes · progress bar</text>
+  <text x="290" y="1001" font-size="11.5" text-anchor="middle" fill="#4a4a63">+ verbatim section, expandable</text>
+
+  <rect x="650" y="938" width="280" height="88" rx="44" fill="#eef7f0" stroke="#2f7a45" stroke-width="1.6"/>
+  <text x="790" y="972" font-size="13" text-anchor="middle" fill="#1a1a2e" font-weight="600">Plain chat message</text>
+  <text x="790" y="992" font-size="11.5" text-anchor="middle" fill="#4a4a63">no forced workflow</text>
+
+  <!-- llm note -->
+  <rect x="700" y="340" width="250" height="132" rx="10" fill="#fbfaff" stroke="#6b2d8f" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="825" y="368" font-size="12" text-anchor="middle" fill="#6b2d8f" font-weight="700">All LLM calls: src/llm.py</text>
+  <text x="825" y="392" font-size="11.5" text-anchor="middle" fill="#4a4a63">Gemini (primary),</text>
+  <text x="825" y="409" font-size="11.5" text-anchor="middle" fill="#4a4a63">local Ollama as fallback</text>
+  <text x="825" y="435" font-size="11.5" text-anchor="middle" fill="#4a4a63">up to 3 calls per query:</text>
+  <text x="825" y="452" font-size="11.5" text-anchor="middle" fill="#4a4a63">select · verify · generate</text>
+</svg>
